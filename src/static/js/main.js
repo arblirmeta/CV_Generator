@@ -122,7 +122,7 @@ function addNewEntry(sectionType) {
         case 'activity':
             template = createActivityTemplate(entryIndex);
             break;
-        case 'responsibility':
+        case 'responsibility': // This case seems unused for top-level "Add" buttons
             const parentId = container.dataset.parent;
             const parentType = container.dataset.parentType;
             const parentIndex = container.dataset.parentIndex;
@@ -146,7 +146,10 @@ function addNewEntry(sectionType) {
     
     // Initialize formatting controls for new textareas
     entryElement.querySelectorAll('textarea').forEach(textarea => {
-        addFormattingControls(textarea);
+        // This might be redundant if initEntryControls handles responsibilities' textareas
+        if (!textarea.closest('.responsibilities-container')) { // Avoid double-adding for responsibility textareas
+            addFormattingControls(textarea);
+        }
     });
 }
 
@@ -183,13 +186,15 @@ function initEntryControls(entryElement) {
         });
     }
     
-    // AI enhancement buttons
-    const aiButtons = entryElement.querySelectorAll('.btn-ai-enhance');
+    // AI enhancement buttons (for any textarea directly under this entry, not responsibilities)
+    // This is likely not used as AI buttons are specific to responsibility descriptions.
+    // Keeping it for safety in case of future direct AI-enhanced fields in main entries.
+    const aiButtons = entryElement.querySelectorAll(':scope > .form-group .btn-ai-enhance');
     aiButtons.forEach(button => {
         button.addEventListener('click', function() {
             const fieldId = this.dataset.target;
             const fieldElement = document.getElementById(fieldId);
-            enhanceWithAI(fieldElement);
+            if (fieldElement) enhanceWithAI(fieldElement, this);
         });
     });
     
@@ -201,49 +206,60 @@ function initEntryControls(entryElement) {
             const parentType = responsibilitiesContainer.dataset.parentType;
             const parentIndex = responsibilitiesContainer.dataset.parentIndex;
             
-            // Create new responsibility entry
             const responsibilityIndex = responsibilitiesContainer.children.length;
             const responsibilityTemplate = createResponsibilityTemplate(responsibilityIndex, parentType, parentIndex);
             
-            // Create new responsibility element
             const responsibilityElement = document.createElement('div');
-            responsibilityElement.className = 'responsibility-container';
+            // Add a class for easier targeting if needed, e.g., 'responsibility-item-wrapper'
+            // responsibilityElement.className = 'responsibility-item-wrapper'; 
             responsibilityElement.innerHTML = responsibilityTemplate;
             
-            // Add to container
             responsibilitiesContainer.appendChild(responsibilityElement);
+            // Pass the responsibilityElement itself, which is the wrapper div.
+            // initResponsibilityControls will then query within this scope.
+            initResponsibilityControls(responsibilityElement); 
             
-            // Initialize responsibility controls
-            initResponsibilityControls(responsibilityElement);
-            
-            // Initialize formatting controls for new textareas
+            // Initialize formatting for the new textarea in the responsibility
             responsibilityElement.querySelectorAll('textarea').forEach(textarea => {
                 addFormattingControls(textarea);
             });
         });
     }
+
+    // Initialize controls for already existing responsibilities if any (e.g. when loading data)
+    entryElement.querySelectorAll('.responsibilities-container > div').forEach(respElement => {
+        // Assuming respElement is the div that contains the structure from createResponsibilityTemplate
+        initResponsibilityControls(respElement);
+    });
 }
 
-function initResponsibilityControls(responsibilityElement) {
-    // Remove button
-    const removeBtn = responsibilityElement.querySelector('.remove-responsibility');
+function initResponsibilityControls(responsibilityContentElement) {
+    // Note: responsibilityContentElement is now the wrapper div that was appended to responsibilitiesContainer.
+    // It contains the .responsibility-header and the .form-group as direct children.
+    
+    // Remove button for responsibility
+    const removeBtn = responsibilityContentElement.querySelector('.remove-responsibility');
     if (removeBtn) {
         removeBtn.addEventListener('click', function() {
             if (confirm('Are you sure you want to remove this responsibility?')) {
-                responsibilityElement.remove();
+                responsibilityContentElement.remove(); // Remove the entire wrapper div
             }
         });
     }
     
-    // AI enhancement buttons
-    const aiButtons = responsibilityElement.querySelectorAll('.btn-ai-enhance');
-    aiButtons.forEach(button => {
-        button.addEventListener('click', function() {
+    // AI enhancement buttons for responsibility
+    const aiButton = responsibilityContentElement.querySelector('.btn-ai-enhance');
+    if (aiButton) {
+        aiButton.addEventListener('click', function() {
             const fieldId = this.dataset.target;
-            const fieldElement = document.getElementById(fieldId);
-            enhanceWithAI(fieldElement);
+            // Ensure fieldElement is searched within the current responsibilityContentElement or document
+            // getElementById is global, which is fine as IDs are unique.
+            const fieldElement = document.getElementById(fieldId); 
+            if (fieldElement) {
+                enhanceWithAI(fieldElement, this);
+            }
         });
-    });
+    }
 }
 
 // Templates for dynamic entries
@@ -252,9 +268,9 @@ function createEducationTemplate(index) {
         <div class="entry-header">
             <div class="entry-title">Education Entry #${index + 1}</div>
             <div class="entry-actions">
-                <span class="move-entry move-up">↑</span>
-                <span class="move-entry move-down">↓</span>
-                <span class="remove-entry">×</span>
+                <span class="move-entry move-up" title="Move Up">↑</span>
+                <span class="move-entry move-down" title="Move Down">↓</span>
+                <span class="remove-entry" title="Remove Entry">×</span>
             </div>
         </div>
         <div class="form-group">
@@ -285,11 +301,11 @@ function createEducationTemplate(index) {
         </div>
         
         <div class="responsibilities-section">
-            <h4>Responsibilities, Achievements or Projects</h4>
+            <h5>Responsibilities, Achievements or Projects</h5>
             <div class="responsibilities-container" id="education-${index}-responsibilities" data-parent-type="education" data-parent-index="${index}">
                 <!-- Responsibilities will be added here -->
             </div>
-            <button type="button" class="btn btn-secondary btn-add-responsibility">Add Entry</button>
+            <button type="button" class="btn btn-sm btn-secondary btn-add-responsibility" style="margin-top:10px;">+ Add Entry</button>
         </div>
     `;
 }
@@ -299,9 +315,9 @@ function createExperienceTemplate(index) {
         <div class="entry-header">
             <div class="entry-title">Work Experience Entry #${index + 1}</div>
             <div class="entry-actions">
-                <span class="move-entry move-up">↑</span>
-                <span class="move-entry move-down">↓</span>
-                <span class="remove-entry">×</span>
+                <span class="move-entry move-up" title="Move Up">↑</span>
+                <span class="move-entry move-down" title="Move Down">↓</span>
+                <span class="remove-entry" title="Remove Entry">×</span>
             </div>
         </div>
         <div class="form-group">
@@ -328,11 +344,11 @@ function createExperienceTemplate(index) {
         </div>
         
         <div class="responsibilities-section">
-            <h4>Responsibilities, Achievements or Projects</h4>
+            <h5>Responsibilities, Achievements or Projects</h5>
             <div class="responsibilities-container" id="experience-${index}-responsibilities" data-parent-type="experience" data-parent-index="${index}">
                 <!-- Responsibilities will be added here -->
             </div>
-            <button type="button" class="btn btn-secondary btn-add-responsibility">Add Entry</button>
+            <button type="button" class="btn btn-sm btn-secondary btn-add-responsibility" style="margin-top:10px;">+ Add Entry</button>
         </div>
     `;
 }
@@ -342,9 +358,9 @@ function createActivityTemplate(index) {
         <div class="entry-header">
             <div class="entry-title">Extracurricular Activity Entry #${index + 1}</div>
             <div class="entry-actions">
-                <span class="move-entry move-up">↑</span>
-                <span class="move-entry move-down">↓</span>
-                <span class="remove-entry">×</span>
+                <span class="move-entry move-up" title="Move Up">↑</span>
+                <span class="move-entry move-down" title="Move Down">↓</span>
+                <span class="remove-entry" title="Remove Entry">×</span>
             </div>
         </div>
         <div class="form-group">
@@ -371,50 +387,67 @@ function createActivityTemplate(index) {
         </div>
         
         <div class="responsibilities-section">
-            <h4>Responsibilities, Achievements or Projects</h4>
+            <h5>Responsibilities, Achievements or Projects</h5>
             <div class="responsibilities-container" id="activity-${index}-responsibilities" data-parent-type="activity" data-parent-index="${index}">
                 <!-- Responsibilities will be added here -->
             </div>
-            <button type="button" class="btn btn-secondary btn-add-responsibility">Add Entry</button>
+            <button type="button" class="btn btn-sm btn-secondary btn-add-responsibility" style="margin-top:10px;">+ Add Entry</button>
         </div>
     `;
 }
 
 function createResponsibilityTemplate(index, parentType, parentIndex) {
+    const uniqueId = `${parentType}-${parentIndex}-responsibility-description-${index}`;
+    // The returned string is the innerHTML for a new div created in addResponsibilityBtn.
+    // This structure includes a header and a form-group, both within that new div.
     return `
-        <div class="responsibility-header">
-            <div class="responsibility-title">Entry #${index + 1}</div>
+        <div class="responsibility-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <div class="responsibility-title" style="font-size: 0.95em; color: #555;">Entry #${index + 1}</div>
             <div class="responsibility-actions">
-                <span class="remove-responsibility">×</span>
+                <span class="remove-responsibility" title="Remove this entry" style="color: var(--danger-color); cursor: pointer; font-size: 1.2em;">×</span>
             </div>
         </div>
         <div class="form-group">
-            <label for="${parentType}-${parentIndex}-responsibility-description-${index}">Description</label>
-            <textarea id="${parentType}-${parentIndex}-responsibility-description-${index}" name="${parentType}[${parentIndex}][responsibilities][${index}][description]"></textarea>
-            <button type="button" class="btn btn-secondary btn-ai-enhance" data-target="${parentType}-${parentIndex}-responsibility-description-${index}">Enhance with AI</button>
+            <label for="${uniqueId}" style="font-size: 0.9em; margin-bottom:3px;">Description</label>
+            <textarea id="${uniqueId}" name="${parentType}[${parentIndex}][responsibilities][${index}][description]" rows="3"></textarea>
+            <div class="ai-controls" style="margin-top: 5px; display: flex; align-items: center; gap: 10px;">
+                <button type="button" class="btn btn-secondary btn-sm btn-ai-enhance" data-target="${uniqueId}">Enhance with AI</button>
+                <span id="ai-feedback-${uniqueId}" class="ai-feedback-area" style="display: inline-block; min-height: 24px; font-size: 0.9em;"></span>
+            </div>
         </div>
     `;
 }
 
 // OpenAI integration
 function initOpenAI() {
-    // Set up global AI enhancement functionality
-    window.enhanceWithAI = function(textElement) {
+    window.enhanceWithAI = function(textElement, buttonElement) {
         const originalText = textElement.value.trim();
-        
+        const feedbackElementId = `ai-feedback-${textElement.id}`;
+        const feedbackArea = document.getElementById(feedbackElementId);
+
+        if (feedbackArea) {
+            feedbackArea.textContent = ''; 
+            feedbackArea.style.color = 'var(--text-color)';
+        }
+
         if (!originalText) {
-            alert('Please enter some text to enhance.');
+            if (feedbackArea) {
+                feedbackArea.textContent = 'Please enter some text.';
+                feedbackArea.style.color = 'var(--danger-color)';
+                setTimeout(() => {
+                    if (feedbackArea && feedbackArea.textContent === 'Please enter some text.') feedbackArea.textContent = '';
+                }, 3000);
+            } else {
+                alert('Please enter some text to enhance.');
+            }
             return;
         }
+
+        if (buttonElement) buttonElement.disabled = true;
+        if (feedbackArea) {
+            feedbackArea.innerHTML = '<span class="loading" style="width:1em; height:1em; border-width:0.15em; vertical-align: middle; margin-right: 5px;"></span>Enhancing...';
+        }
         
-        // Show loading indicator
-        const parentElement = textElement.parentElement;
-        const loadingElement = document.createElement('div');
-        loadingElement.className = 'ai-container';
-        loadingElement.innerHTML = '<div>Enhancing with AI... <span class="loading"></span></div>';
-        parentElement.appendChild(loadingElement);
-        
-        // Send to server for AI enhancement
         fetch('/api/enhance-text', {
             method: 'POST',
             headers: {
@@ -422,42 +455,58 @@ function initOpenAI() {
             },
             body: JSON.stringify({
                 text: originalText,
-                field_type: textElement.name.split('[')[0] // education, experience, activity, or responsibility
+                field_type: textElement.name.includes('responsibilities') ? 'responsibility' : textElement.name.split('[')[0]
             }),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (buttonElement) buttonElement.disabled = false;
+            if (feedbackArea) feedbackArea.innerHTML = ''; 
+            
+            if (!response.ok) {
+                return response.json()
+                    .catch(() => { // Handle cases where response is not valid JSON
+                        throw new Error(`HTTP error ${response.status} - ${response.statusText || "Server error"}`);
+                    })
+                    .then(errData => {
+                        throw new Error(errData?.error || `HTTP error ${response.status}`);
+                    });
+            }
+            return response.json();
+        })
         .then(data => {
-            // Remove loading indicator
-            loadingElement.innerHTML = `
-                <div>AI Suggestion:</div>
-                <div class="ai-suggestion">${data.enhanced_text}</div>
-                <button class="btn btn-sm btn-success" id="accept-suggestion-${textElement.id}">Accept</button>
-                <button class="btn btn-sm btn-secondary" id="dismiss-suggestion-${textElement.id}">Dismiss</button>
-            `;
-            
-            // Add event listeners for accept/dismiss buttons
-            document.getElementById(`accept-suggestion-${textElement.id}`).addEventListener('click', function() {
+            if (data.error) {
+                if (feedbackArea) {
+                    feedbackArea.textContent = `Error: ${data.error}`;
+                    feedbackArea.style.color = 'var(--danger-color)';
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } else if (data.enhanced_text) {
                 textElement.value = data.enhanced_text;
-                parentElement.removeChild(loadingElement);
-            });
-            
-            document.getElementById(`dismiss-suggestion-${textElement.id}`).addEventListener('click', function() {
-                parentElement.removeChild(loadingElement);
-            });
+                if (feedbackArea) {
+                    feedbackArea.textContent = '✓ Enhanced!';
+                    feedbackArea.style.color = 'var(--success-color)';
+                    setTimeout(() => {
+                        if (feedbackArea && feedbackArea.textContent === '✓ Enhanced!') feedbackArea.textContent = '';
+                    }, 3000);
+                }
+            } else {
+                if (feedbackArea) {
+                    feedbackArea.textContent = 'Unexpected response. Please try again.';
+                    feedbackArea.style.color = 'var(--danger-color)';
+                }
+            }
         })
         .catch(error => {
-            console.error('Error:', error);
-            loadingElement.innerHTML = `<div class="text-danger">Error: ${error.message}</div>`;
-            
-            // Add dismiss button
-            const dismissButton = document.createElement('button');
-            dismissButton.className = 'btn btn-sm btn-secondary';
-            dismissButton.textContent = 'Dismiss';
-            dismissButton.addEventListener('click', function() {
-                parentElement.removeChild(loadingElement);
-            });
-            
-            loadingElement.appendChild(dismissButton);
+            if (buttonElement) buttonElement.disabled = false;
+            if (feedbackArea) {
+                feedbackArea.innerHTML = ''; 
+                feedbackArea.textContent = `Failed: ${error.message}`;
+                feedbackArea.style.color = 'var(--danger-color)';
+            } else {
+                console.error('AI Enhancement Error:', error);
+                alert(`AI enhancement failed: ${error.message}`);
+            }
         });
     };
 }
@@ -465,23 +514,25 @@ function initOpenAI() {
 // PDF Export functionality
 function initPDFExport() {
     const exportButton = document.getElementById('export-pdf');
-    if (exportButton) {
+    const form = document.getElementById('cv-form');
+    const previewButton = document.getElementById('preview-cv');
+
+
+    if (exportButton && form) {
         exportButton.addEventListener('click', function() {
-            // Validate form first
-            if (!validateForm()) {
+            if (!validateForm(form)) {
                 alert('Please fill in all required fields before exporting.');
                 return;
             }
             
-            // Show loading indicator
-            const loadingElement = document.createElement('div');
-            loadingElement.className = 'ai-container';
-            loadingElement.innerHTML = '<div>Generating PDF... <span class="loading"></span></div>';
-            document.querySelector('.form-container').appendChild(loadingElement);
-            
-            // Submit form with export flag
-            const formData = new FormData(document.getElementById('cv-form'));
-            formData.append('export_pdf', 'true');
+            const originalButtonText = exportButton.innerHTML;
+            exportButton.disabled = true;
+            exportButton.innerHTML = '<span class="loading" style="width:1em; height:1em; border-width:0.15em; vertical-align: middle; margin-right: 5px;"></span>Generating PDF...';
+            if(previewButton) previewButton.disabled = true;
+
+
+            const formData = new FormData(form);
+            // formData.append('export_pdf', 'true'); // This flag seems unused in backend based on current logic
             
             fetch('/generate-cv', {
                 method: 'POST',
@@ -491,10 +542,9 @@ function initPDFExport() {
                 if (response.ok) {
                     return response.blob();
                 }
-                throw new Error('PDF generation failed');
+                return response.text().then(text => { throw new Error(text || 'PDF generation failed on server')});
             })
             .then(blob => {
-                // Create download link
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
@@ -503,36 +553,29 @@ function initPDFExport() {
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
-                
-                // Remove loading indicator
-                document.querySelector('.form-container').removeChild(loadingElement);
+                document.body.removeChild(a);
             })
             .catch(error => {
-                console.error('Error:', error);
-                loadingElement.innerHTML = `<div class="text-danger">Error: ${error.message}</div>`;
-                
-                // Add dismiss button
-                const dismissButton = document.createElement('button');
-                dismissButton.className = 'btn btn-sm btn-secondary';
-                dismissButton.textContent = 'Dismiss';
-                dismissButton.addEventListener('click', function() {
-                    document.querySelector('.form-container').removeChild(loadingElement);
-                });
-                
-                loadingElement.appendChild(dismissButton);
+                console.error('PDF Export Error:', error);
+                alert(`PDF Export Failed: ${error.message}`);
+            })
+            .finally(() => {
+                exportButton.disabled = false;
+                exportButton.innerHTML = originalButtonText;
+                if(previewButton) previewButton.disabled = false;
             });
         });
     }
 }
 
 // Form validation
-function validateForm() {
-    const requiredFields = document.querySelectorAll('#cv-form [required]');
+function validateForm(form) {
+    const requiredFields = form.querySelectorAll('[required]');
     let valid = true;
     
     requiredFields.forEach(field => {
         if (!field.value.trim()) {
-            field.classList.add('is-invalid');
+            field.classList.add('is-invalid'); // Consider adding .is-invalid styles in CSS
             valid = false;
         } else {
             field.classList.remove('is-invalid');
@@ -544,26 +587,48 @@ function validateForm() {
 
 // Preview CV
 function updatePreview() {
-    const formData = new FormData(document.getElementById('cv-form'));
+    const form = document.getElementById('cv-form');
+    const previewButton = document.getElementById('preview-cv');
+    const exportButton = document.getElementById('export-pdf');
+
+    if (!form) return;
+
+    const originalButtonText = previewButton.innerHTML;
+    previewButton.disabled = true;
+    previewButton.innerHTML = '<span class="loading" style="width:1em; height:1em; border-width:0.15em; vertical-align: middle; margin-right: 5px;"></span>Loading Preview...';
+    if(exportButton) exportButton.disabled = true;
+
+    const formData = new FormData(form);
     
     fetch('/preview-cv', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text || 'Preview generation failed')});
+        }
+        return response.text();
+    })
     .then(html => {
         document.getElementById('cv-preview-content').innerHTML = html;
     })
     .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('cv-preview-content').innerHTML = `<div class="text-danger">Error generating preview: ${error.message}</div>`;
+        console.error('Preview Error:', error);
+        document.getElementById('cv-preview-content').innerHTML = `<div class="text-danger" style="padding:20px;">Error generating preview: ${error.message}</div>`;
+    })
+    .finally(() => {
+        previewButton.disabled = false;
+        previewButton.innerHTML = originalButtonText;
+        if(exportButton) exportButton.disabled = false;
     });
 }
 
-// Initialize preview button
 document.addEventListener('DOMContentLoaded', function() {
     const previewButton = document.getElementById('preview-cv');
     if (previewButton) {
         previewButton.addEventListener('click', updatePreview);
     }
+    // Initial preview load if needed, or on tab switch for relevant sections
+    // updatePreview(); // Optionally load preview on page load
 });

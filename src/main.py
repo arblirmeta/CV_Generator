@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify, send_file
 import os
-import json
+# import json # Removed as it's not directly used
 import weasyprint
 from io import BytesIO
 import openai
@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
 
 # OpenAI API key - replace with your own key
-openai_api_key = "your-api-key-here"
+openai_api_key = os.environ.get("OPENAI_API_KEY")
 
 @app.route('/')
 def index():
@@ -50,14 +50,20 @@ def enhance_text():
     
     try:
         # Use OpenAI to enhance the text
-        enhanced_text = enhance_with_ai(text, field_type)
-        return jsonify({'enhanced_text': enhanced_text})
+        enhanced_text_result, error_message = enhance_with_ai(text, field_type)
+        if error_message:
+            print(f"Error from enhance_with_ai: {error_message}")
+            return jsonify({'enhanced_text': enhanced_text_result, 'error': error_message}), 500 # Or 400/422 if client error
+        return jsonify({'enhanced_text': enhanced_text_result})
     except Exception as e:
-        print(f"OpenAI API error: {e}")
-        return jsonify({'enhanced_text': text, 'error': str(e)})
+        # This handles errors in the enhance_text route itself, or re-raised from enhance_with_ai if not caught there
+        print(f"Error in /api/enhance-text route: {e}")
+        return jsonify({'enhanced_text': text, 'error': str(e)}), 500
 
 def enhance_with_ai(text, field_type):
     # Set OpenAI API key
+    if not openai_api_key:
+        return text, "OpenAI API key is not configured on the server."
     openai.api_key = openai_api_key
     
     # Create prompt based on field type
@@ -74,21 +80,30 @@ def enhance_with_ai(text, field_type):
     
     try:
         # Call OpenAI API
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant that enhances CV text in a McKinsey style."},
+            {"role": "user", "content": prompt}
+        ]
+        
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages,
             max_tokens=150,
             n=1,
             stop=None,
             temperature=0.7,
         )
         
+        # Print the full response for debugging (optional, can be removed in production)
+        # print(f"OpenAI API Response: {response}") 
+        
         # Extract and return enhanced text
-        enhanced_text = response.choices[0].text.strip()
-        return enhanced_text
+        enhanced_text = response.choices[0].message['content'].strip()
+        return enhanced_text, None
     except Exception as e:
-        print(f"OpenAI API error: {e}")
-        return text
+        print(f"OpenAI API call failed: {e}")
+        # Consider more specific error messages based on type of exception if possible
+        return text, f"AI enhancement failed: {str(e)}"
 
 def process_form_data(form):
     # Initialize CV data structure
