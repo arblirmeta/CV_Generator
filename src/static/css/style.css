@@ -9,8 +9,10 @@
   --success-color: #28a745;
   --danger-color: #dc3545;
   --warning-color: #ffc107;
-  --font-primary: 'Times New Roman', serif;
-  --font-size-base: 12pt;
+  --font-primary: 'Times New Roman', serif; /* For CV output */
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* For UI elements */
+  --font-size-base: 12pt; /* Base size for CV output */
+  --font-size-ui: 10pt;   /* Specific font size for UI elements */
 }
 
 * {
@@ -20,9 +22,9 @@
 }
 
 body {
-  font-family: var(--font-primary);
-  font-size: var(--font-size-base);
-  line-height: 1;
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-size: var(--font-size-ui); /* Changed to UI font size */
+  line-height: 1.4; /* Improved line height for UI readability */
   color: var(--text-color);
   background-color: #f9f9f9;
 }
@@ -44,7 +46,7 @@ header {
 h1, h2, h3, h4 {
   margin-bottom: 15px;
   color: var(--primary-color);
-  font-family: var(--font-primary);
+  font-family: var(--font-ui); /* Changed to UI font */
 }
 
 /* Form Styles */
@@ -85,16 +87,24 @@ label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
-  font-family: var(--font-primary);
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-size: var(--font-size-ui);
 }
 
 input, textarea, select {
   width: 100%;
-  padding: 10px;
-  border: 1px solid var(--border-color);
+  padding: 12px; /* Increased padding */
+  border: 1px solid #ccc; /* Softer border */
   border-radius: 4px;
-  font-size: var(--font-size-base);
-  font-family: var(--font-primary);
+  font-size: var(--font-size-ui); /* Changed to UI font size */
+  font-family: var(--font-ui); /* Changed to UI font */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--secondary-color);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, .25); /* secondary-color with opacity */
 }
 
 textarea {
@@ -106,18 +116,36 @@ textarea {
   display: inline-block;
   background-color: var(--primary-color);
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px; /* Increased padding */
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: var(--font-size-base);
-  transition: background-color 0.3s;
-  font-family: var(--font-primary);
+  font-size: var(--font-size-ui); /* Changed to UI font size */
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-weight: 600; /* Bolder text for buttons */
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, opacity 0.15s ease-in-out;
 }
 
 .btn:hover {
   background-color: var(--secondary-color);
+  opacity: 0.95; /* Slight fade on hover */
 }
+
+.btn:active {
+  background-color: var(--primary-color); /* Darken on active */
+  opacity: 1;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.125);
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: .65;
+  cursor: not-allowed;
+}
+
 
 .btn-secondary {
   background-color: #6c757d;
@@ -125,6 +153,13 @@ textarea {
 
 .btn-secondary:hover {
   background-color: #5a6268;
+  opacity: 0.95;
+}
+
+.btn-secondary:active {
+  background-color: #545b62;
+  opacity: 1;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.125);
 }
 
 .btn-success {
@@ -133,6 +168,13 @@ textarea {
 
 .btn-success:hover {
   background-color: #218838;
+  opacity: 0.95;
+}
+
+.btn-success:active {
+  background-color: #1e7e34;
+  opacity: 1;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.125);
 }
 
 .btn-danger {
@@ -141,6 +183,13 @@ textarea {
 
 .btn-danger:hover {
   background-color: #c82333;
+  opacity: 0.95;
+}
+
+.btn-danger:active {
+  background-color: #bd2130;
+  opacity: 1;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.125);
 }
 
 .btn-add {
@@ -148,8 +197,9 @@ textarea {
 }
 
 .btn-sm {
-  padding: 5px 10px;
-  font-size: 14px;
+  padding: 8px 12px; /* Adjusted padding for sm buttons */
+  font-size: calc(var(--font-size-ui) * 0.875); /* Relative font size */
+  font-weight: normal; /* Normal weight for small buttons */
 }
 
 /* Dynamic Entry Styles */
@@ -171,8 +221,8 @@ textarea {
 
 .entry-title {
   font-weight: bold;
-  font-size: 18px;
-  font-family: var(--font-primary);
+  font-size: calc(var(--font-size-ui) + 4pt); /* Adjusted size */
+  font-family: var(--font-ui); /* Changed to UI font */
 }
 
 .entry-actions {
@@ -216,7 +266,8 @@ textarea {
 
 .project-title {
   font-weight: bold;
-  font-family: var(--font-primary);
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-size: calc(var(--font-size-ui) + 2pt); /* Adjusted size */
 }
 
 .project-actions {
@@ -290,7 +341,8 @@ textarea {
   padding: 3px 8px;
   cursor: pointer;
   font-size: 14px;
-  font-family: var(--font-primary);
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-size: var(--font-size-ui);
 }
 
 .format-btn:hover {
@@ -302,7 +354,7 @@ textarea {
   border-color: var(--secondary-color);
 }
 
-/* Font Controls */
+/* Font Controls - These are for the CV template itself, keep Times New Roman */
 .font-controls {
   display: flex;
   gap: 10px;
@@ -310,37 +362,49 @@ textarea {
 }
 
 .font-select, .font-size-select, .line-height-select {
-  padding: 3px 8px;
+  padding: 3px 8px; /* Keep padding small for these controls */
   border: 1px solid #ccc;
   border-radius: 3px;
-  font-size: 14px;
+  font-size: 10pt; /* Standard UI small font size */
   width: auto;
-  font-family: var(--font-primary);
+  font-family: var(--font-primary); /* Kept for CV specific controls */
 }
 
 /* Tabs */
 .tabs {
   display: flex;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #ccc; /* Softer border */
   margin-bottom: 20px;
 }
 
 .tab {
-  padding: 10px 20px;
+  padding: 10px 15px; /* Adjusted padding */
   cursor: pointer;
   border: 1px solid transparent;
-  border-bottom: none;
+  border-bottom: none; /* Handled by .tabs border-bottom */
   border-radius: 4px 4px 0 0;
-  background-color: #f5f5f5;
-  margin-right: 5px;
-  font-family: var(--font-primary);
+  background-color: #e9ecef; /* Light gray for inactive tabs */
+  margin-right: 4px; /* Spacing between tabs */
+  font-family: var(--font-ui); /* Changed to UI font */
+  font-size: var(--font-size-ui);
+  color: var(--primary-color);
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.tab:hover {
+  background-color: #dee2e6; /* Slightly darker on hover */
+  color: var(--secondary-color);
+  border-color: #ccc #ccc transparent; /* Show top/side borders on hover */
 }
 
 .tab.active {
   background-color: white;
-  border-color: var(--border-color);
-  border-bottom-color: white;
-  margin-bottom: -1px;
+  border-color: #ccc #ccc white; /* Border for active tab to merge with content area */
+  border-width: 1px;
+  border-style: solid;
+  color: var(--text-color); /* Standard text color for active tab */
+  font-weight: bold;
+  margin-bottom: -1px; /* Overlap bottom border of .tabs container */
 }
 
 .tab-content {
@@ -374,21 +438,56 @@ textarea {
 
 /* McKinsey CV Template Preview Styles */
 .mckinsey-cv {
-  font-family: 'Times New Roman', serif;
-  font-size: 12pt;
+  font-family: var(--font-primary); /* Explicitly use CV font */
+  font-size: var(--font-size-base); /* Explicitly use CV font size */
+  line-height: 1; /* Specific line height for CV */
   max-width: 800px;
-  margin: 0 auto;
+  margin: 20px auto; /* Add some margin for preview on web page */
   background-color: white;
-  line-height: 1;
   /* US Letter size with exact margins from example */
   width: 21.6cm;
   min-height: 27.9cm;
   /* Exact margins from example document */
-  padding-top: 1.9cm;
-  padding-bottom: 1.4cm;
-  padding-left: 1.9cm;
-  padding-right: 1.9cm;
+  padding: 1.9cm 1.9cm 1.4cm 1.9cm; /* Use 'padding' shorthand */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Add shadow to preview */
 }
+
+/* Validation Styling */
+input.is-invalid, textarea.is-invalid, select.is-invalid {
+  border-color: var(--danger-color);
+}
+
+input.is-invalid:focus, textarea.is-invalid:focus, select.is-invalid:focus {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, .25); /* danger-color with opacity */
+}
+
+.mckinsey-header,
+.mckinsey-name,
+.mckinsey-contact,
+.mckinsey-section,
+.mckinsey-section-title,
+.mckinsey-entry,
+.mckinsey-entry-header,
+.mckinsey-entry-content,
+.mckinsey-entry-content ul,
+.mckinsey-project, /* This class and its children seem unused in cv_template.html but styled for safety */
+.mckinsey-project-title,
+.mckinsey-project-date,
+.mckinsey-project-description,
+.mckinsey-skills {
+  font-family: var(--font-primary); /* Ensure all children use CV font */
+  font-size: var(--font-size-base); /* Ensure all children use CV font size */
+}
+
+/* Specific line-heights for CV preview if different from body's UI line-height */
+.mckinsey-cv,
+.mckinsey-contact,
+.mckinsey-entry-content,
+.mckinsey-skills {
+  line-height: 1;
+}
+
 
 .mckinsey-header {
   text-align: center;
@@ -396,16 +495,13 @@ textarea {
 }
 
 .mckinsey-name {
-  font-size: 12pt;
   font-weight: bold;
   margin-bottom: 5px;
   text-transform: uppercase;
 }
 
 .mckinsey-contact {
-  font-size: 12pt;
   margin-bottom: 20px;
-  line-height: 1;
 }
 
 .mckinsey-section {
@@ -413,7 +509,6 @@ textarea {
 }
 
 .mckinsey-section-title {
-  font-size: 12pt;
   font-weight: bold;
   text-transform: uppercase;
   border-bottom: 1px solid #000;
@@ -446,12 +541,11 @@ textarea {
 
 .mckinsey-entry-content {
   margin-left: 0.63cm;
-  line-height: 1;
 }
 
 .mckinsey-entry-content ul {
   list-style-type: disc;
-  padding-left: 0.63cm;
+  padding-left: 0.63cm; /* This was 0.63cm before, matching example */
   margin: 0;
 }
 
@@ -479,28 +573,46 @@ textarea {
 
 .mckinsey-skills {
   margin-top: 5px;
-  line-height: 1;
 }
 
 /* Print styles for PDF export */
+/* These apply if someone uses browser print on the preview page. */
+/* WeasyPrint PDF uses styles from cv_template.html. */
 @media print {
   body {
     background-color: white;
+    font-family: var(--font-primary) !important; /* Ensure print uses CV font */
+    font-size: var(--font-size-base) !important; /* Ensure print uses CV font size */
+    line-height: 1 !important;
   }
   
   .container, .form-container, .cv-preview {
-    box-shadow: none;
-    padding: 0;
-    margin: 0;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   
-  .form-container, .btn, header, .preview-header {
-    display: none;
+  /* Hide all UI elements during print */
+  .form-container, .btn, header, .preview-header, .tabs, .form-section h3, 
+  .entry-actions, .project-actions, .ai-container, .formatting-controls, .font-controls,
+  nav /* Assuming nav might be added later */ {
+    display: none !important;
   }
   
   .mckinsey-cv {
-    padding: 1.9cm 1.9cm 1.4cm 1.9cm;
-    width: 21.6cm;
-    height: 27.9cm;
+    padding: 1.9cm 1.9cm 1.4cm 1.9cm !important; /* Use exact CV margins */
+    width: 100% !important; /* Fill page width */
+    height: auto !important;
+    min-height: 0 !important; /* Reset min-height */
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: none !important; /* Remove any borders for print */
+  }
+
+  /* Ensure all mckinsey-cv children also use the primary font for printing */
+  .mckinsey-cv, .mckinsey-cv * {
+    font-family: var(--font-primary) !important;
+    font-size: var(--font-size-base) !important;
+    color: #000 !important; /* Ensure black text for print */
   }
 }

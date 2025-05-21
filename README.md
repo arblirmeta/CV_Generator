@@ -11,7 +11,8 @@ Diese Web-Anwendung ermöglicht es Benutzern, professionelle Lebensläufe im McK
 - Fähigkeiten, Aktivitäten und Interessen
 - Responsibilities, Achievements or Projects für jeden Eintrag
 - PDF-Export im exakten McKinsey-Stil
-- OpenAI-Integration zur Verbesserung von Beschreibungen
+- OpenAI-Integration zur Verbesserung von Beschreibungen (jetzt mit dem `gpt-3.5-turbo` Modell für qualitativ hochwertigere Textverbesserungen)
+- Modernisierte Benutzeroberfläche für verbesserte Benutzerfreundlichkeit und klareres Feedback.
 
 ## Installation
 
@@ -38,10 +39,16 @@ Diese Web-Anwendung ermöglicht es Benutzern, professionelle Lebensläufe im McK
    pip install -r requirements.txt
    ```
 
-5. Konfigurieren Sie Ihren OpenAI API-Schlüssel:
-   - Öffnen Sie die Datei `src/main.py`
-   - Ersetzen Sie `"your-api-key-here"` mit Ihrem eigenen OpenAI API-Schlüssel
-   - Wenn Sie keinen API-Schlüssel haben, funktioniert die Anwendung trotzdem, aber ohne die KI-Verbesserungsfunktion
+## Configuration
+
+Before running the application, you need to set up your OpenAI API key:
+
+1.  Create a file named `.env` in the root of the project (you can copy `.env.example`).
+2.  Open the `.env` file and replace `"your_actual_openai_api_key_here"` with your actual OpenAI API key.
+    Example: `OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"`
+3.  The application will load this key when it starts.
+
+**Important:** Keep your `.env` file private and do not commit it to version control. Add `.env` to your `.gitignore` file if it's not already there.
 
 ## Verwendung
 
@@ -71,7 +78,7 @@ Diese Web-Anwendung ermöglicht es Benutzern, professionelle Lebensläufe im McK
 
 - Wenn die Anwendung nicht startet, stellen Sie sicher, dass Port 5000 nicht bereits verwendet wird
 - Wenn der PDF-Export nicht funktioniert, stellen Sie sicher, dass WeasyPrint korrekt installiert ist
-- Bei Problemen mit der OpenAI-Integration überprüfen Sie Ihren API-Schlüssel
+- Bei Problemen mit der OpenAI-Integration überprüfen Sie Ihren API-Schlüssel und dessen Konfiguration im `.env` File. Stellen Sie auch sicher, dass eine Internetverbindung besteht.
 
 ## Lizenz
 
