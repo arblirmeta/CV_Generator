@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McKinsey-Style CV Generator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>McKinsey-Style CV Generator</h1>
+            <p>Create a professional CV with dynamic sections and AI-enhanced descriptions</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <form id="cv-form" action="/generate-cv" method="post">
+            <div class="form-container">
+                <!-- Tabs Navigation -->
+                <div class="tabs">
+                    <div class="tab active" data-target="personal-tab">Personal Information</div>
+                    <div class="tab" data-target="education-tab">Education</div>
+                    <div class="tab" data-target="experience-tab">Work Experience</div>
+                    <div class="tab" data-target="activity-tab">Activities</div>
+                    <div class="tab" data-target="skills-tab">Skills & Interests</div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div id="personal-tab" class="tab-content active">
+                    <div class="form-section">
+                        <h2>Personal Information</h2>
+                        <div class="form-group">
+                            <label for="full-name">Full Name</label>
+                            <input type="text" id="full-name" name="personal[full_name]" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth-info">Date and Place of Birth</label>
+                            <input type="text" id="birth-info" name="personal[birth_info]" placeholder="e.g., May 05 1999, in Eilat, Israel">
+                        </div>
+                        <div class="form-group">
+                            <label for="nationality">Nationality</label>
+                            <input type="text" id="nationality" name="personal[nationality]">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="personal[phone]">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="personal[email]" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="linkedin">LinkedIn</label>
+                            <input type="text" id="linkedin" name="personal[linkedin]" placeholder="LinkedIn profile URL or just 'LinkedIn'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Section -->
+                <div id="education-tab" class="tab-content">
+                    <div class="form-section">
+                        <h2>Education</h2>
+                        <div id="education-entries">
+                            <!-- Dynamic education entries will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-add" data-section="education">Add Education</button>
+                    </div>
+                </div>
+
+                <!-- Work Experience Section -->
+                <div id="experience-tab" class="tab-content">
+                    <div class="form-section">
+                        <h2>Work Experience</h2>
+                        <div id="experience-entries">
+                            <!-- Dynamic experience entries will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-add" data-section="experience">Add Work Experience</button>
+                    </div>
+                </div>
+
+                <!-- Extracurricular Activities Section -->
+                <div id="activity-tab" class="tab-content">
+                    <div class="form-section">
+                        <h2>Extracurricular Activities</h2>
+                        <div id="activity-entries">
+                            <!-- Dynamic activity entries will be added here -->
+                        </div>
+                        <button type="button" class="btn btn-add" data-section="activity">Add Activity</button>
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div id="skills-tab" class="tab-content">
+                    <div class="form-section">
+                        <h2>Skills, Activities & Interests</h2>
+                        <div class="form-group">
+                            <label for="languages">Languages</label>
+                            <textarea id="languages" name="skills[languages]" placeholder="e.g., English (C1), German (C2), Hebrew (C2), Spanish (B1)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="technical-skills">Technical Skills</label>
+                            <textarea id="technical-skills" name="skills[technical]" placeholder="e.g., Excel (advanced), Python (basic), SQL (basic), BPMN 2.0"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="interests">Activities & Interests</label>
+                            <textarea id="interests" name="skills[interests]" placeholder="e.g., Kickboxing, Strength Training, Nutrition & Healthy Living"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" id="preview-cv" class="btn">Preview CV</button>
+                    <button type="button" id="export-pdf" class="btn btn-success">Export as PDF</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- CV Preview Section -->
+        <div class="cv-preview">
+            <div class="preview-header">
+                <h2>CV Preview</h2>
+            </div>
+            <div id="cv-preview-content" class="mckinsey-cv">
+                <!-- Preview content will be loaded here -->
+                <p>Fill in the form and click "Preview CV" to see your CV here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

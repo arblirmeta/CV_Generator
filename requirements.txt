@@ -1,0 +1,5 @@
+Flask==2.2.3
+Werkzeug==2.2.3
+Jinja2==3.1.2
+WeasyPrint==59.0
+openai==0.27.0

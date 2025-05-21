@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>McKinsey-Style CV</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 1.9cm 1.9cm 1.4cm 1.9cm;
+        }
+        body {
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1;
+        }
+        .cv-container {
+            max-width: 21.6cm;
+            margin: 0 auto;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .name {
+            font-size: 12pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .contact-info {
+            font-size: 12pt;
+            margin-bottom: 20px;
+            line-height: 1;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .entry {
+            margin-bottom: 15px;
+        }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .entry-header .institution,
+        .entry-header .location,
+        .entry-header .company,
+        .entry-header .organization {
+            font-weight: bold;
+        }
+        .entry-header .degree,
+        .entry-header .position,
+        .entry-header .role {
+            font-style: italic;
+            font-weight: normal;
+        }
+        .entry-content {
+            margin-left: 0.63cm;
+        }
+        .entry-content ul {
+            list-style-type: disc;
+            padding-left: 0;
+            margin: 0;
+        }
+        .entry-content li {
+            margin-bottom: 0.2cm;
+        }
+        .skills {
+            margin-top: 5px;
+            line-height: 1;
+        }
+        
+        @media print {
+            body {
+                font-size: 12pt;
+                margin: 0;
+                padding: 0;
+            }
+            .cv-container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cv-container">
+        <!-- Header with Personal Information -->
+        <div class="header">
+            <div class="name">{{ cv.personal.full_name }}</div>
+            <div class="contact-info">
+                {% if cv.personal.birth_info %}{{ cv.personal.birth_info }}{% endif %}
+                {% if cv.personal.nationality %} | Nationality: {{ cv.personal.nationality }}{% endif %}<br>
+                {% if cv.personal.phone %}Tel: {{ cv.personal.phone }}{% endif %}
+                {% if cv.personal.email %} | E-mail: {{ cv.personal.email }}{% endif %}
+                {% if cv.personal.linkedin %} | {{ cv.personal.linkedin }}{% endif %}
+            </div>
+        </div>
+
+        <!-- Education Section -->
+        {% if cv.education %}
+        <div class="section">
+            <div class="section-title">EDUCATION</div>
+            {% for edu in cv.education %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="institution">{{ edu.institution }}</div>
+                    <div class="location">{{ edu.location }}</div>
+                </div>
+                <div class="entry-header">
+                    <div class="degree">{{ edu.degree }}</div>
+                    <div>{{ edu.start_date }} - {{ edu.end_date }}</div>
+                </div>
+                <div class="entry-content">
+                    <ul>
+                        {% if edu.gpa %}
+                        <li>{{ edu.gpa }}</li>
+                        {% endif %}
+                        
+                        <!-- Responsibilities for this education entry -->
+                        {% if edu.responsibilities %}
+                        {% for resp in edu.responsibilities %}
+                        <li>{{ resp.description|safe }}</li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Work Experience Section -->
+        {% if cv.experience %}
+        <div class="section">
+            <div class="section-title">WORK EXPERIENCE</div>
+            {% for exp in cv.experience %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="company">{{ exp.company }}</div>
+                    <div class="location">{{ exp.location }}</div>
+                </div>
+                <div class="entry-header">
+                    <div class="position">{{ exp.position }}</div>
+                    <div>{{ exp.start_date }} - {{ exp.end_date }}</div>
+                </div>
+                <div class="entry-content">
+                    <ul>
+                        <!-- Responsibilities for this experience entry -->
+                        {% if exp.responsibilities %}
+                        {% for resp in exp.responsibilities %}
+                        <li>{{ resp.description|safe }}</li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Extracurricular Activities Section -->
+        {% if cv.activity %}
+        <div class="section">
+            <div class="section-title">EXTRACURRICULAR ACTIVITIES</div>
+            {% for act in cv.activity %}
+            <div class="entry">
+                <div class="entry-header">
+                    <div class="organization">{{ act.organization }}</div>
+                    <div class="location">{{ act.location }}</div>
+                </div>
+                <div class="entry-header">
+                    <div class="role">{{ act.role }}</div>
+                    <div>{{ act.start_date }} - {{ act.end_date }}</div>
+                </div>
+                <div class="entry-content">
+                    <ul>
+                        <!-- Responsibilities for this activity entry -->
+                        {% if act.responsibilities %}
+                        {% for resp in act.responsibilities %}
+                        <li>{{ resp.description|safe }}</li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Skills Section -->
+        {% if cv.skills %}
+        <div class="section">
+            <div class="section-title">SKILLS, ACTIVITIES & INTERESTS</div>
+            <div class="skills">
+                {% if cv.skills.languages %}
+                <strong>Languages:</strong> {{ cv.skills.languages }}<br>
+                {% endif %}
+                {% if cv.skills.technical %}
+                <strong>Technical:</strong> {{ cv.skills.technical }}<br>
+                {% endif %}
+                {% if cv.skills.interests %}
+                <strong>Activities & Interests:</strong> {{ cv.skills.interests }}
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
